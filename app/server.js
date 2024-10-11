@@ -2,6 +2,7 @@ const express = require('express')
 const {default : mongoose} = require('mongoose')
 const path = require('path')
 const { Allroutes } = require('./router/router')
+const morgan = require('morgan')
 
 module.exports = class application {
     #app = express()
@@ -17,6 +18,7 @@ module.exports = class application {
         this.errorHandling();
     }
     configApplication(){
+        this.#app.use(morgan("dev"))
         this.#app.use(express.json())
         this.#app.use(express.urlencoded({extends : true}))
         this.#app.use(express.static(path.join(__dirname , '..' , 'public')))

@@ -2,9 +2,12 @@ const express = require('express')
 const {default : mongoose} = require('mongoose')
 const path = require('path')
 const createError = require('http-errors')
-const { AllRoutes } = require('./router/router')
+const swaggerUI = require('swagger-ui-express')
 const morgan = require('morgan')
 mongoose.set('strictQuery', true);
+const { AllRoutes } = require('./router/router')
+const swaggerJSDoc = require('swagger-jsdoc')
+const { url } = require('inspector')
 
 module.exports = class application {
     #app = express()
@@ -24,6 +27,20 @@ module.exports = class application {
         this.#app.use(express.json())
         this.#app.use(express.urlencoded({extends : true}))
         this.#app.use(express.static(path.join(__dirname , '..' , 'public')))
+        this.#app.use('/api-doc' , swaggerUI.serve , swaggerUI.setup(swaggerJSDoc({
+            swaggerDefinition : {
+                info : {
+                    title : 'online shop' ,
+                    version : '1.0.0' ,
+                    description : 'regular online shop'
+                },
+                servers : [
+                {
+                    url : 'http://localhost:3000'
+                }
+            ]
+            }, apis : ['./app/router/*/*.js']
+        })))
 
     }
     createServer(){

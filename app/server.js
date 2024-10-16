@@ -7,6 +7,7 @@ const morgan = require('morgan')
 mongoose.set('strictQuery', true);
 const { AllRoutes } = require('./router/router')
 const swaggerJSDoc = require('swagger-jsdoc')
+const cors = require('cors')
 const { url } = require('inspector')
 
 module.exports = class application {
@@ -17,12 +18,14 @@ module.exports = class application {
         this.#PORT = PORT
         this.#DB_URI =DB_URI
         this.configApplication();
+        this.initRedis();
         this.connectToMongoDB();
         this.createServer();
         this.createRoutes();
         this.errorHandling();
     }
     configApplication(){
+        this.#app.use(cors())
         this.#app.use(morgan("dev"))
         this.#app.use(express.json())
         this.#app.use(express.urlencoded({extends : true}))
@@ -60,9 +63,9 @@ module.exports = class application {
             process.exit(0);
         })
     } 
-        
-        
-    
+    initRedis(){
+        require('./utils/init_redis')
+    }
     createRoutes(){
         this.#app.use(AllRoutes)
 
@@ -79,7 +82,8 @@ module.exports = class application {
             return res.status(statusCode).json({
                 errors : {
                 statusCode ,
-                message
+                message ,
+                serverError
             } 
         })
         })

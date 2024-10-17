@@ -34,7 +34,40 @@ router.post('/add' , CategoryController.addCategory)
  */
 
 
-router.get('/parents' ,)
+router.get('/parents' , CategoryController.getAllParents)
+
+/**
+ * @swagger
+ *  /admin/category/Children/{parent}:
+ *      get:
+ *          tags: [Admin-Panel]
+ *          summary: get all children of parents Category
+ *          parameters:
+ *              -   in: path
+ *                  name: parent
+ *                  type: string
+ *                  required: true
+ *          responses:
+ *              200:
+ *                  description: success 
+ */
+
+
+router.get('/children/:parent' , CategoryController.getChildOfParents)
+
+/**
+ * @swagger
+ *  /admin/category/all:
+ *      get:
+ *          tags: [Admin-Panel]
+ *          summary: get all Category
+ *          responses:
+ *              200:
+ *                  description: success 
+ */
+
+
+router.get('/all' , CategoryController.getAllCategory)
 module.exports = {
     CategoryRoutes : router
 }

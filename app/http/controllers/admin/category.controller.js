@@ -99,12 +99,13 @@ class CategoryController extends Controller {
             //}
 
         //])
-           //return res.status(200).json({
-            //data:{
-                //statusCode : 200 ,
-                //categories
-            //}
-           //})  
+        const categories = await CategoryModel.find({parent : undefined} , {__v : 0 ,})
+           return res.status(200).json({
+            data:{
+                statusCode : 200 ,
+                categories
+            }
+        })  
         } catch (error) {
             next(error)
         }

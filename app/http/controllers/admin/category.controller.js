@@ -1,7 +1,7 @@
 const createHttpError = require("http-errors");
 const { CategoryModel } = require("../../../models/categories");
 const Controller = require("../controller");
-const { addCategorySchema } = require("../../validators/admin/category.schema");
+const { addCategorySchema, updateCategorySchema } = require("../../validators/admin/category.schema");
 const mongoose = require('mongoose')
 class CategoryController extends Controller {
     async addCategory(req , res , next){
@@ -41,9 +41,20 @@ class CategoryController extends Controller {
             next(error)
         }
     }
-    editCategory(req , res , next){
+    async editCategoryTitle(req , res , next){
         try {
-            
+            const {id} = req.params;
+            const {title} = req.body;
+            const category = await this.checkExistCategory(id)
+            await updateCategorySchema.validateAsync(req.body)
+            const resultUpdate = await CategoryModel.updateOne({_id : id} , {$set : title})
+            if(resultUpdate.modifiedCount == 0) throw createHttpError.InternalServerError('category not updated')
+                return res.status(200).json({
+                    data : {
+                        statusCode : 200 ,
+                        message : 'updated successfully'
+                    }
+            })
         } catch (error) {
             next(error)
         }
@@ -135,6 +146,7 @@ class CategoryController extends Controller {
             ])
             return res.status(200).json({
                 data : {
+                    statusCode : 200 ,
                     category
                 }
             })
@@ -172,8 +184,11 @@ class CategoryController extends Controller {
     }
     async getAllCategoryWithOutPopulate(req , res , next){
         try {
-            const categories = await CategoryModel.aggregate([]);
+            const categories = await CategoryModel.aggregate([
+                {$match : {}}
+            ]);
             return res.status(200).json({
+                statusCode : 200 ,
                 data : {
                     categories
                 }

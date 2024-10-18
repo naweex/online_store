@@ -170,6 +170,19 @@ class CategoryController extends Controller {
             next(error)
         }
     }
+    async getAllCategoryWithOutPopulate(req , res , next){
+        try {
+            const categories = await CategoryModel.aggregate([]);
+            return res.status(200).json({
+                data : {
+                    categories
+                }
+            })
+            
+        } catch (error) {
+            next(error)
+        }
+    }
     async checkExistCategory(id){
         const category = await CategoryModel.findById(id);
         if(!category) throw createHttpError.NotFound('category not found');

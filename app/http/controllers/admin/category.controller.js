@@ -2,7 +2,7 @@ const createHttpError = require("http-errors");
 const { CategoryModel } = require("../../../models/categories");
 const Controller = require("../controller");
 const { addCategorySchema } = require("../../validators/admin/category.schema");
-
+const mongoose = require('mongoose')
 class CategoryController extends Controller {
     async addCategory(req , res , next){
         try {
@@ -73,50 +73,48 @@ class CategoryController extends Controller {
             //}
 
         //])
-        const category = await CategoryModel.aggregate([
-            {
-                $graphLookup : {
-                    from : 'categories' ,
-                    startWith : '$_id' ,
-                    connectFromField : '_id' ,
-                    connectToField : 'parent' ,
-                    maxDepth : 5 ,
-                    depthField : 'depth' ,
-                    as : 'children'
-                } 
-            },
-            {
-                $project : {
-                    __v : 0 ,
-                    'children.__v' : 0 ,
-                    'children.parent' : 0
-                }
-            },
-            {
-                $match : {
-                    parent : undefined
-                }
-            }
+        //const categories = await CategoryModel.aggregate([
+            //{
+                //$graphLookup : {
+                    //from : 'categories' ,
+                    //startWith : '$_id' ,
+                    //connectFromField : '_id' ,
+                    //connectToField : 'parent' ,
+                    //maxDepth : 5 ,
+                    //depthField : 'depth' ,
+                    //as : 'children'
+                //} 
+            //},
+            //{
+                //$project : {
+                    //__v : 0 ,
+                    //'children.__v' : 0 ,
+                    //'children.parent' : 0
+                //}
+            //},
+            //{
+                //$match : {
+                    //parent : undefined
+                //}
+            //}
 
-        ])
-           return res.status(200).json({
-            data:{
-                statusCode : 200 ,
-                category
-            }
-           })  
+        //])
+           //return res.status(200).json({
+            //data:{
+                //statusCode : 200 ,
+                //categories
+            //}
+           //})  
         } catch (error) {
             next(error)
         }
     }
     async getCategoryById(req , res , next){
         try {
-            const {id} = req.params;
+            const {id : _id} = req.params;
             const category = await CategoryModel.aggregate([
                 {
-                    $match : {
-                        _id : id
-                    }
+                    $match : { _id : mongoose.Types.ObjectId(_id) }
                 },
                 {
                     $lookup : {

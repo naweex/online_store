@@ -8,3 +8,11 @@ const createBlogSchema = Joi.object({
     tags : Joi.array().min(0).max(20).error(new Error('tags should not over 20 character')) ,
     category : Joi.string().pattern(MongoIDPattern).error(new Error('category not found'))
 });
+
+const updateCategorySchema = Joi.object({
+    title : Joi.string().min(3).max(30).error(new Error('the title of category not accepted'))
+})
+
+module.exports = {
+    createBlogSchema
+}

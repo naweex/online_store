@@ -47,7 +47,7 @@ class CategoryController extends Controller {
             const {title} = req.body;
             const category = await this.checkExistCategory(id)
             await updateCategorySchema.validateAsync(req.body)
-            const resultUpdate = await CategoryModel.updateOne({_id : id} , {$set : title})
+            const resultUpdate = await CategoryModel.updateOne({_id : id} , {$set : {title}})
             if(resultUpdate.modifiedCount == 0) throw createHttpError.InternalServerError('category not updated')
                 return res.status(200).json({
                     data : {

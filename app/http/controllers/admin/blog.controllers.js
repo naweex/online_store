@@ -38,10 +38,34 @@ class BlogController extends Controller {
                 {
                     $lookup : {
                     from : 'users' ,
-                    foreignField : 'author' ,
-                    localField : '_id' ,
-                    as : 'author'
-            }   }
+                    foreignField : '_id' ,
+                    localField : 'author' ,
+                    as : 'author'          
+                }   
+            } ,
+            {
+                $unwind : '$author'
+            },
+            {
+                $lookup : {
+                from : 'categories' ,
+                foreignField : '_id' ,
+                localField : 'category' ,
+                as : 'author'          
+            }   
+        } ,
+        {
+            $unwind : '$author'
+        },
+            {
+                $project : {
+                    'author.__v' :  0 ,
+                    'author.otp' :  0 ,
+                    'author.roles' :  0 ,
+                    'author.discount' :  0 ,
+                    'author.bills' :  0 , 
+                }
+            }
             ])
             return res.status(200).json({
                 data : {

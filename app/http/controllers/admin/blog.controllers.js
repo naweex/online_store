@@ -11,7 +11,8 @@ class BlogController extends Controller {
             req.body.image = req.body.image.replace(/\\/g , '/')
             const {title , text , short_text , category , tags} = blogDataBody;
             const image  = req.body.image
-            const blog = await BlogModel.create({title , image , text , short_text , category , tags})
+            const author = req.user._id
+            const blog = await BlogModel.create({title , image , text , short_text , category , tags , author})
             return res.json({blog})
         } catch (error) {
             deleteFileInPublic(req.body.image)

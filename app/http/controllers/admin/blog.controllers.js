@@ -109,7 +109,7 @@ class BlogController extends Controller {
         }
     }
     async findBlog(query = {}){
-        const blog = await BlogModel.findOne(query).populate([{path : 'category'} , {path : 'user'}]);
+        const blog = await BlogModel.findOne(query).populate([{path : 'category' , select : {'children' : 0}} , {path : 'user'}]);
         if(!blog) throw createHttpError.NotFound('blog not found')
             return blog
     }

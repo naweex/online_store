@@ -33,10 +33,20 @@ class BlogController extends Controller {
     }
     async getListOfBlogs(req , res , next){
         try {
+            const blog = await BlogModel.aggregate([
+                {$match : {}} ,
+                {
+                    $lookup : {
+                    from : 'users' ,
+                    foreignField : 'author' ,
+                    localField : '_id' ,
+                    as : 'author'
+            }   }
+            ])
             return res.status(200).json({
-                statusCode : 200 ,
                 data : {
-                    blogs : []
+                    statusCode : 200 ,
+                    blogs
                 }
             })
         } catch (error) {

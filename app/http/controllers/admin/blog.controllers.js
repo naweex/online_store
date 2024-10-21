@@ -3,6 +3,7 @@ const { createBlogSchema } = require('../../validators/admin/blog.schema')
 const Controller = require('./../controller')
 const path = require('path')
 const { deleteFileInPublic } = require('../../../utils/functions')
+const createHttpError = require('http-errors')
 class BlogController extends Controller {
     async createBlog(req , res , next){
         try {
@@ -26,6 +27,14 @@ class BlogController extends Controller {
     }
     async getOneBlogById(req , res , next){
         try {
+            const {id} = req.params;
+            const blog = await this.findBlog({_id : id})
+            return res.status(200).json({
+                data : {
+                    statusCode : 200 ,
+                    blog
+                }
+            })
             
         } catch (error) {
             next(error)
@@ -51,15 +60,16 @@ class BlogController extends Controller {
                 from : 'categories' ,
                 foreignField : '_id' ,
                 localField : 'category' ,
-                as : 'author'          
+                as : 'category'          
             }   
         } ,
         {
-            $unwind : '$author'
+            $unwind : '$category'
         },
             {
                 $project : {
                     'author.__v' :  0 ,
+                    'category.__v' : 0 ,
                     'author.otp' :  0 ,
                     'author.roles' :  0 ,
                     'author.discount' :  0 ,
@@ -97,6 +107,11 @@ class BlogController extends Controller {
         } catch (error) {
             next(error)
         }
+    }
+    async findBlog(query = {}){
+        const blog = await BlogModel.findOne(query).populate([{path : 'category'} , {path : 'user'}]);
+        if(!blog) throw createHttpError.NotFound('blog not found')
+            return blog
     }
 }
 

@@ -13,7 +13,12 @@ class BlogController extends Controller {
             const image  = req.body.image
             const author = req.user._id
             const blog = await BlogModel.create({title , image , text , short_text , category , tags , author})
-            return res.json({blog})
+            return res.status(201).json({
+                data : {
+                    statusCode : 201 ,
+                    message : 'blog created successfully'
+                }
+            })
         } catch (error) {
             deleteFileInPublic(req.body.image)
             next(error)

@@ -120,7 +120,7 @@ class BlogController extends Controller {
             }
             const data = req.body
             let nullishData = ['',' ' ,'0',0,null,undefined]
-            let blackListFields = ['bookmarks','dislikes','likes','comments']
+            let blackListFields = ['bookmarks','dislikes','likes','comments','author']
             Object.keys(data).forEach(key => {
                 if(blackListFields.includes(key)) delete data[key]
                 if(typeof data[key] == 'string') data[key] = data[key].trim();

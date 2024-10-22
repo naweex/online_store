@@ -114,24 +114,30 @@ class BlogController extends Controller {
         try {
             const {id} = req.params;
             await this.findBlog(id)
-            const author = req.user._id
-            req.body.image = path.join(req.Body.fileUploadPath , req.Body.filename)
-            req.body.image = req.body.image.replace(/\\/g , '/')
-            if (req.body.image){
-
+            if(req?.Body?.fileUploadPath && req?.Body?.filename){
+                req.body.image = path.join(req.Body.fileUploadPath , req.Body.filename)
+                req.body.image = req.body.image.replace(/\\/g , '/')
             }
-            const {title , text , short_text , category , tags} = blogDataBody;
-            const image  = req.body.image
-            const blog = await BlogModel.updateOne({title , image , text , short_text , category , tags , author})
-            return res.status(201).json({
+            const data = req.body
+            let nullishData = ['',' ' ,'0',0,null,undefined]
+            let blackListFields = ['bookmarks','dislikes','likes','comments']
+            Object.keys(data).forEach(key => {
+                if(blackListFields.includes(key)) delete data[key]
+                if(typeof data[key] == 'string') data[key] = data[key].trim();
+                if(Array.isArray(data[key]) && Array.length > 0) data[key] = data[key].map(item => item.trim())
+                if(nullishData.includes(data[key])) delete data[key];
+            })
+            const updateResult = await BlogModel.updateOne({_id : id} , {$set : data})
+            if(updateResult.modifiedCount == 0) throw createHttpError.InternalServerError('update failed!!')
+            return res.status(200).json({
                 data : {
-                    statusCode : 201 ,
-                    message : 'blog created successfully'
+                    statusCode : 200 ,
+                    message : 'blog update successfully'
                 }
             })
             
         } catch (error) {
-            deleteFileInPublic(req.body.image)
+            deleteFileInPublic(req?.body?.image)
             next(error)
         }
     }

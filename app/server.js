@@ -32,6 +32,7 @@ module.exports = class application {
         this.#app.use(express.static(path.join(__dirname , '..' , 'public')))
         this.#app.use('/api-doc' , swaggerUI.serve , swaggerUI.setup(swaggerJSDoc({
             swaggerDefinition : {
+                openapi : '3.0.0' ,
                 info : {
                     title : 'online shop' ,
                     version : '1.0.0' ,
@@ -43,9 +44,10 @@ module.exports = class application {
                 }
             ]
             }, apis : ['./app/router/*/*.js']
-        })))
-
-    }
+        }), {explorer : true}
+    )
+  )
+}
     createServer(){
         const http = require('http')
         http.createServer(this.#app).listen(this.#PORT, () => {

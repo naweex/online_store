@@ -17,7 +17,12 @@ const Schema = new mongoose.Schema({
     birthday : {type : String} ,
     roles  : {type : [String] , default : ['USER']}
 
-})
+}, {
+    timestamps : true ,
+    toJSON : {
+        virtuals : true
+    }
+});
 
 module.exports = {
     UserModel : mongoose.model('user' , Schema)

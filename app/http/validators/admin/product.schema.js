@@ -7,9 +7,9 @@ const createBlogSchema = Joi.object({
     short_text : Joi.string().error(createHttpError.BadRequest('text you send is not accepted')) ,
     tags : Joi.array().min(0).max(20).error(createHttpError.BadRequest('tags should not over 20 character')) ,
     category : Joi.string().pattern(MongoIDPattern).error(createHttpError.BadRequest('category not found')) ,
-    price : Joi.string().error(createHttpError.BadRequest('input price is not valid')) ,
-    category : Joi.string().pattern(MongoIDPattern).error(createHttpError.BadRequest('category not found')) ,
-    category : Joi.string().pattern(MongoIDPattern).error(createHttpError.BadRequest('category not found')) ,
+    price : Joi.number().error(createHttpError.BadRequest('input price is not valid')) ,
+    discount : Joi.number().error(createHttpError.BadRequest('discount is not valid')) ,
+    count : Joi.number().error(createHttpError.BadRequest('number of product is not valid')) ,
     filename : Joi.string().pattern(/(\.png|\.jpg|\.webp|\.jpeg|\.gif)$/).error(createHttpError.BadRequest('image you send is not accepted')) ,
     fileUploadPath : Joi.allow()
 });

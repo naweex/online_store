@@ -2,6 +2,7 @@ const Controller = require('../controller')
 class ProductController extends Controller {
     addProduct(req , res , next){
         try {
+            return res.json(req.body)
             
         } catch (error) {
             next(error)

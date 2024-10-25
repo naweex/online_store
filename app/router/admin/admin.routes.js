@@ -17,7 +17,7 @@ const router = require('express').Router()
 
 router.use('/category' , AdminApiCategoryRouter)
 router.use('/blogs' ,AdminApiBlogRouter )
-router.use('/product' , AdminApiProductRouter)
+router.use('/products' , AdminApiProductRouter)
 module.exports = {
     AdminRoutes : router
 }

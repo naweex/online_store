@@ -3,7 +3,7 @@ const { UserModel } = require("../../models/users");
 const {SECRET_KEY} = require('../../utils/constance')
 const JWT = require('jsonwebtoken')
 function getToken(headers){
-    const [bearer , token]= headers?.['access-token']?.split(' ') || []
+    const [bearer , token]= headers?.authorization?.split(' ') || []
     if(token && ['Bearer' , 'bearer'].includes(bearer)) return token;
     throw createHttpError.Unauthorized('unauthorized user account for login')
 }

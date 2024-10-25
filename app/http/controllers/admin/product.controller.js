@@ -2,29 +2,63 @@ const {
   createProductSchema,
 } = require('../../validators/admin/product.schema');
 const Controller = require('../controller');
-const { deleteFileInPublic } = require('../../../utils/functions')
+const { deleteFileInPublic, listOfImagesFromRequest } = require('../../../utils/functions');
+const { ProductModel } = require('../../../models/products');
+const path = require('path');
 class ProductController extends Controller {
   async addProduct(req, res, next) {
     try {
+      const images = listOfImagesFromRequest(req?.files || [] , req.body.fileUploadPath)
       const productBody = await createProductSchema.validateAsync(req.body);
-      req.body.image = path.join(
-        blogDataBody.fileUploadPath,
-        blogDataBody.filename
-      );
-      req.body.image = req.body.image.replace(/\\/g, '/');
-      const { title, text, short_text, category, tags , count,discount,price,width,height,length,weight } = blogDataBody;
-      const image = req.body.image;
-      const author = req.user._id;
+
+      const {
+        title,
+        text,
+        short_text,
+        category,
+        tags,
+        count,
+        discount,
+        price,
+        width,
+        height,
+        length,
+        weight,
+      } = productBody;
+      const supplier = req.user._id;
+
       let feature = {}
-      if(!width) feature.width = 0;
-      else feature.width = width
-      if(!height) feature.height = 0;
-      else feature.height = height
-      if(!length) feature.length = 0;
-      else feature.length = length
-      if(!weight) feature.weight = 0;
-      else feature.weight = weight
-      return res.json(productBody);
+      feature.colors = colors;
+      if (isNaN(width) || isNaN(height) || isNaN(length) || isNaN(weight)) {
+        if (!width) feature.width = 0;
+        else feature.width = width;
+        if (!height) feature.height = 0;
+        else feature.height = height;
+        if (!length) feature.length = 0;
+        else feature.length = length;
+        if (!weight) feature.weight = 0;
+        else feature.weight = weight;
+      }
+
+      const product = await ProductModel.create({
+        title,
+        text,
+        short_text,
+        category,
+        tags,
+        count,
+        discount,
+        price,
+        images,
+        feature,
+        type
+      });
+      return res.json({
+        data: {
+          statusCode: 201,
+          message: 'product register successfully',
+        },
+      });
     } catch (error) {
       deleteFileInPublic(req.body.image);
       next(error);
@@ -42,8 +76,15 @@ class ProductController extends Controller {
       next(error);
     }
   }
-  getAllProducts(req, res, next) {
+  async getAllProducts(req, res, next) {
     try {
+      const product = await ProductModel.find({})
+      return res.status(200).json({
+        data: {
+          statusCode : 200 ,
+          product
+        }
+      })
     } catch (error) {
       next(error);
     }

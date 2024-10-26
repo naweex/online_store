@@ -5,6 +5,8 @@ const Controller = require('../controller');
 const { deleteFileInPublic, listOfImagesFromRequest } = require('../../../utils/functions');
 const { ProductModel } = require('../../../models/products');
 const path = require('path');
+const { objectIdValidators } = require('../../validators/public.validator');
+const createHttpError = require('http-errors');
 class ProductController extends Controller {
   async addProduct(req, res, next) {
     try {
@@ -29,15 +31,15 @@ class ProductController extends Controller {
 
       let feature = {}
       feature.colors = colors;
-      if (isNaN(width) || isNaN(height) || isNaN(length) || isNaN(weight)) {
+      if (!isNaN(+width) || !isNaN(+height) || !isNaN(+length) || !isNaN(+weight)) {
         if (!width) feature.width = 0;
-        else feature.width = width;
+        else feature.width = +width;
         if (!height) feature.height = 0;
-        else feature.height = height;
+        else feature.height = +height;
         if (!length) feature.length = 0;
-        else feature.length = length;
+        else feature.length = +length;
         if (!weight) feature.weight = 0;
-        else feature.weight = weight;
+        else feature.weight = +weight;
       }
 
       const product = await ProductModel.create({
@@ -89,11 +91,24 @@ class ProductController extends Controller {
       next(error);
     }
   }
-  getOneProduct(req, res, next) {
+  async getOneProduct(req, res, next) {
     try {
+      const {id} = req.params;
+      const product = await this.findProductById(id)
+      return res.status(200).json({
+        statusCode : 200 ,
+        product
+      }) 
     } catch (error) {
       next(error);
     }
+  }
+  async findProductById(product){
+    const {id} = await objectIdValidators.validateAsync({id : productID})
+    const product = await ProductModel.findById(id)
+    if(!product) throw createHttpError.NotFound('product not found')
+      return product
+
   }
 }
 

@@ -7,12 +7,26 @@ const {
   listOfImagesFromRequest,
   copyObject,
   setFeatures,
+  deleteInvalidPropertyInObject,
 } = require('../../../utils/functions');
 const { ProductModel } = require('../../../models/products');
 const path = require('path');
 const { objectIdValidators } = require('../../validators/public.validator');
 const createHttpError = require('http-errors');
 const { StatusCodes: httpStatus } = require('http-status-codes');
+const productBlackList = {
+BOOKMARKS : 'bookmarks' ,
+LIKES : 'likes' ,
+DISLIKES : 'dislikes' ,
+COMMENTS : 'comments' ,
+SUPPLIER : 'supplier' ,
+WEIGHT : 'weight' ,
+HEIGHT : 'height' ,
+WIDTH : 'width' ,
+LENGTH : 'length' ,
+COLORS : 'colors'
+}
+Object.freeze(productBlackList)
 class ProductController extends Controller {
   async addProduct(req, res, next) {
     try {
@@ -31,10 +45,6 @@ class ProductController extends Controller {
         count,
         discount,
         price,
-        width,
-        height,
-        length,
-        weight,
       } = productBody;
       const supplier = req.user._id;
       let features = setFeatures(req.body)
@@ -63,21 +73,21 @@ class ProductController extends Controller {
       next(error);
     }
   }
-  editProduct(req, res, next) {
+  async editProduct(req, res, next) {
     try {
+      const {id} = req.params;
+      const product = await this.findProductById(id)
       const data = copyObject(req.body)
         data.images = listOfImagesFromRequest(req?.files || [],req.body.fileUploadPath);
         data.features = setFeatures(req.body)
-        let nullishData = ['',' ' ,'0',0,null,undefined]
-        let blackListFields = ['bookmarks','dislikes','likes','comments','supplier','width','length','weight','height','colors']
-        Object.keys(data).forEach(key => {
-            if(blackListFields.includes(key)) delete data[key]
-            if(typeof data[key] == 'string') data[key] = data[key].trim();
-            if(Array.isArray(data[key]) && data[key].length > 0) data[key] = data[key].map(item => item.trim())
-              if(Array.isArray(data[key]) && data[key].length == 0) delete data[key]
-            if(nullishData.includes(data[key])) delete data[key];
+        let blackListFields = Object.values(productBlackList)
+        deleteInvalidPropertyInObject(data , blackListFields)
+        const updateProductResult = await ProductModel.updateOne({_id : product.id} , {$set : data})
+        if(updateProductResult.modifiedCount == 0) throw {status : httpStatus.INTERNAL_SERVER_ERROR , message : 'InternalServerError'}
+        return res.status(httpStatus.OK).json({
+          statusCode : httpStatus.OK ,
+          message : 'updated successfully'
         })
-        return res.json(data)
     } catch (error) {
       next(error);
     }

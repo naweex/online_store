@@ -25,5 +25,8 @@
     "redis": "^4.7.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "http-status-codes": "^2.3.0"
   }
 }

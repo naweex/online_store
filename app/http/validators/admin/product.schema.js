@@ -6,6 +6,7 @@ const createProductSchema = Joi.object({
     text : Joi.string().error(createHttpError.BadRequest('text you send is not accepted')) ,
     short_text : Joi.string().error(createHttpError.BadRequest('text you send is not accepted')) ,
     tags : Joi.array().min(0).max(20).error(createHttpError.BadRequest('tags should not over 20 character')) ,
+    colors : Joi.array().min(0).max(20).error(createHttpError.BadRequest('tags should not over 20 character')) ,
     category : Joi.string().regex(MongoIDPattern).error(createHttpError.BadRequest('category not found')) ,
     price : Joi.number().error(createHttpError.BadRequest('input price is not valid')) ,
     discount : Joi.number().error(createHttpError.BadRequest('discount is not valid')) ,

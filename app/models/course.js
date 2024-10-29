@@ -1,6 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const { commentSchema } = require("./public.schema");
-const { ref } = require("joi");
+const { ref, string } = require("joi");
 const { text } = require("body-parser");
 const Episode = mongoose.Schema({
     title : {type : String , required : true} ,
@@ -27,6 +27,7 @@ const courseSchema = new mongoose.Schema({
     price : {type : Number , default : 0} ,
     discount : {type : Number , default : 0 } ,
     type : {type : String , default : 'free'/*free , cash , special */,required : true} ,
+    status : {type : String , default : 'not started' ,/*notStarted,completed,opening*/} ,
     time : {type : String , default :'00:00:00'} ,
     teacher : {type : mongoose.Types.ObjectId,ref : 'user', required : true} ,
     chapters : {type : [Chapter] , default : [] } ,

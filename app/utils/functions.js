@@ -47,7 +47,8 @@ function verifyRefreshToken(token){
                 const {mobile} = payload || {};
                 const user = await UserModel.findOne({mobile} , {password : 0 , otp : 0})
                 if(!user) reject(createHttpError.Unauthorized('not found any account'))
-                const refreshToken = await redisClient.get(user._id);
+                const refreshToken = await redisClient.get(user?._id || 'default_key');
+                if (!refreshToken) reject(createHttpError.Unauthorized('cant access to yore account'))
                 if (token === refreshToken) return resolve(mobile);
                 reject(createHttpError.Unauthorized('cant access to yore account'))
                 
@@ -55,10 +56,54 @@ function verifyRefreshToken(token){
         })
     }
 function deleteFileInPublic (fileAddress){
+    if(fileAddress){
     const pathFile = path.join(__dirname , '..' , '..' , 'public' , fileAddress)
-    fs.unlinkSync(pathFile)
+    if(fs.existsSync(pathFile)) fs.unlinkSync(pathFile)
+    }
+    
 } 
+function listOfImagesFromRequest(files , fileUploadPath){
+    if(files?.length > 0){
+        return ((files.map(file => path.join(fileUploadPath , file.filename))).map(item => item.replace(/\\/g, '/')))
+    }else{
+        return []
+    }
 
+}
+function setFeatures(){
+    const {colors , width ,height , length , weight} = body;
+    let features = {};
+    features.colors = colors;
+    if (
+      !isNaN(+width) ||
+      !isNaN(+height) ||
+      !isNaN(+length) ||
+      !isNaN(+weight)
+    ) {
+      if (!width) features.width = 0;
+      else features.width = +width;
+      if (!height) features.height = 0;
+      else features.height = +height;
+      if (!length) features.length = 0;
+      else features.length = +length;
+      if (!weight) features.weight = 0;
+      else features.weight = +weight;
+    }
+        return features
+}
+function copyObject(object){
+    return JSON.parse(JSON.stringify(object))
+}
+function deleteInvalidPropertyInObject(data = {} , blackListFields = []){
+    let nullishData = ['',' ' ,'0',0,null,undefined]
+    Object.keys(data).forEach(key => {
+        if(blackListFields.includes(key)) delete data[key]
+        if(typeof data[key] == 'string') data[key] = data[key].trim();
+        if(Array.isArray(data[key]) && data[key].length > 0) data[key] = data[key].map(item => item.trim())
+          if(Array.isArray(data[key]) && data[key].length == 0) delete data[key]
+        if(nullishData.includes(data[key])) delete data[key];
+    })
+}
 
 
 module.exports = {
@@ -66,5 +111,9 @@ module.exports = {
     SignAccessToken ,
     SignRefreshToken ,
     verifyRefreshToken ,
-    deleteFileInPublic
+    deleteFileInPublic ,
+    listOfImagesFromRequest ,
+    copyObject ,
+    setFeatures ,
+    deleteInvalidPropertyInObject
 }

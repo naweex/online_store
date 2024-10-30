@@ -4,6 +4,7 @@ const { randomInt, SignAccessToken, verifyRefreshToken, SignRefreshToken } = req
 const Controller = require('../../controller')
 const { UserModel } = require("../../../../models/users")
 const { ROLES } = require("../../../../utils/constance")
+const {StatusCodes : HttpStatus} = require('http-status-codes')
 class UserAuthController extends Controller {
     async getOtp(req , res , next){
         try {
@@ -12,9 +13,9 @@ class UserAuthController extends Controller {
             const code = randomInt()
             const result = await this.saveUser(mobile , code)
             if(!result) throw new createHttpError.Unauthorized('code not send , please try again')
-            return res.status(200).send({
-             data: {
-                statusCode : 200 ,
+            return res.status(HttpStatus.OK).send({
+            statusCode : HttpStatus.OK ,
+             data: { 
                 message : 'code sent to you successfully' ,
                 code ,
                 mobile
@@ -36,7 +37,8 @@ class UserAuthController extends Controller {
         if(+user.otp.expiresIn < now) throw createHttpError.Unauthorized('yore code are expire')
         const accessToken = await SignAccessToken(user._id) 
         const refreshToken = await SignRefreshToken(user._id)
-        return res.json({
+        return res.status(HttpStatus.OK).json({
+            statusCode : HttpStatus.OK ,
             data :{
                 accessToken ,
                 refreshToken
@@ -54,7 +56,8 @@ class UserAuthController extends Controller {
             const user = await UserModel.findOne({mobile})
             const accessToken = await SignAccessToken(user._id)
             const newRefreshToken = await SignRefreshToken(user._id)
-            return res.json({
+            return res.status(HttpStatus.OK).json({
+                statusCode : HttpStatus.OK ,
                 data : {
                     accessToken ,
                     refreshToken : newRefreshToken

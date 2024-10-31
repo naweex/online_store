@@ -79,30 +79,6 @@ class CourseController extends Controller {
       next(error);
     }
   }
-  async addChapter(req, res, next) {
-    try {
-      const { id, title, text } = req.body;
-      await this.findCourseById(id);
-      const saveChapterResult = await CourseModel.updateOne(
-        { _id: id },
-        {
-          $push: {
-            chapters: { title, text, episodes: [] },
-          },
-        }
-      );
-      if (saveChapterResult.modifiedCount == 0)
-        throw createHttpError.InternalServerError('chapter is not added');
-      return res.status(HttpStatus.CREATED).json({
-        statusCode: HttpStatus.CREATED,
-        data: {
-          message: 'chapter added successfully',
-        },
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
   async findCourseById(id) {
     if (!mongoose.isValidObjectId(id))
       throw createHttpError.BadRequest('id is not valid');

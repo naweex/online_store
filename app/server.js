@@ -1,14 +1,15 @@
 const express = require('express')
 const {default : mongoose} = require('mongoose')
+const morgan = require('morgan')
 const path = require('path')
 const createError = require('http-errors')
 const swaggerUI = require('swagger-ui-express')
-const morgan = require('morgan')
-mongoose.set('strictQuery', true);
-const { AllRoutes } = require('./router/router')
 const swaggerJSDoc = require('swagger-jsdoc')
+mongoose.set('strictQuery', true);
 const cors = require('cors')
 const { url } = require('inspector')
+require('dotenv').config()
+const { AllRoutes } = require('./router/router')
 
 module.exports = class application {
     #app = express()

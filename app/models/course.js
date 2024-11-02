@@ -2,13 +2,17 @@ const { default: mongoose } = require("mongoose");
 const { commentSchema } = require("./public.schema");
 const { ref, string } = require("joi");
 const { text } = require("body-parser");
-const Episode = mongoose.Schema({
+const Episode = new mongoose.Schema({
     title : {type : String , required : true} ,
     text : {type : String , required : true} ,
     type : {type : String , default : 'free'} ,
-    time : {type : String , required : true}
+    time : {type : String , required : true} ,
+    videoAddress : {type : String , require : true}
+} , {toJSON : {virtuals : true}})
+Episode.virtual('videoURL').get(function(){
+    return `${process.env.BASE_URL}:${process.env.APPLICATION_PORT}/${this.videoAddress}`
 })
-const Chapter = mongoose.Schema({
+const Chapter = new mongoose.Schema({
     title : {type : String , required : true} ,
     text : {type : String , default : ''} ,
     episodes : {type : [Episode] , default : []} , 
@@ -38,6 +42,7 @@ const courseSchema = new mongoose.Schema({
     }
 });
 courseSchema.index({title : 'text' , short_text : 'text' , text : 'text'})
+
 
 module.exports = {
     CourseModel : mongoose.model('course' , courseSchema)

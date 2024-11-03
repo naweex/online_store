@@ -14,8 +14,7 @@ router.post(
   CourseController.addCourse
 );
 router.get('/:id', CourseController.getCourseById);
-
-router.patch();
+router.patch('/update/:id' , uploadFile.single('image') ,CourseController.updateCourseById);
 router.delete();
 router.put();
 

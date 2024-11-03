@@ -7,6 +7,7 @@ const Controller = require('../../controller');
 const { StatusCodes: HttpStatus } = require('http-status-codes');
 const path = require('path');
 const { default: mongoose } = require('mongoose');
+const { copyObject, deleteInvalidPropertyInObject, deleteFileInPublic } = require('../../../../utils/functions');
 class CourseController extends Controller {
   async getListOfCourse(req, res, next) {
     try {
@@ -89,6 +90,32 @@ class CourseController extends Controller {
       });
     } catch (error) {
       next(error);
+    }
+  }
+  async updateCourseById(req , res , next) {
+    try {
+      const {id} = req.params;
+      const course = await this.findCourseById(id)
+      const data = copyObject(req.body)
+      const {filename , fileUploadPath} = req.body;
+      let blackListFields = ['time' , 'chapters' , 'episodes' , 'students' , 'bookmarks' , 'likes' , 'dislikes' , 'comments']
+      deleteInvalidPropertyInObject(data , blackListFields  )
+      if(req.file){
+        data.image = path.join(filename , fileUploadPath)
+        deleteFileInPublic(course.image)
+      }
+      const updateCourseResult = await CourseModel.updateOne({_id : id} , {
+        $set : data
+      })
+      if(!updateCourseResult.modifiedCount) throw new createHttpError.InternalServerError('course not updated')
+      return res.status(HttpStatus.OK).json({
+        statusCode : HttpStatus.OK ,
+        data : {
+          message : 'course updated successfully'
+        }
+      })
+    } catch (error) {
+      next(error)
     }
   }
   async findCourseById(id) {

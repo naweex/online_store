@@ -7,7 +7,7 @@ const Controller = require('../../controller');
 const { StatusCodes: HttpStatus } = require('http-status-codes');
 const path = require('path');
 const { default: mongoose } = require('mongoose');
-const { copyObject, deleteInvalidPropertyInObject, deleteFileInPublic } = require('../../../../utils/functions');
+const { copyObject, deleteInvalidPropertyInObject, deleteFileInPublic, getTimeOfCourse } = require('../../../../utils/functions');
 class CourseController extends Controller {
   async getListOfCourse(req, res, next) {
     try {
@@ -60,8 +60,8 @@ class CourseController extends Controller {
         category,
         price,
         discount,
+        image,
         type,
-        image: '00:00:00',
         status: 'notStarted',
         teacher,
       });

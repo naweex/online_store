@@ -38,8 +38,19 @@ function fileFilter(req , file , cb){
     }
     return cb(createHttpError.BadRequest('format of file not accepted'))
 }
-const maxSize = 1 * 1000 * 1000
-const uploadFile = multer({storage ,fileFilter, limits: {fileSize : maxSize}})
+function videoFilter(req , file , cb){
+    const ext = path.extname(file.originalname);
+    const mimeTypes = ['.mp4' , ',mov' , '.mkv' , '.mpg' , '.avi']
+    if(mimeTypes.includes(ext)){
+        return cb(null , true)
+    }
+    return cb(createHttpError.BadRequest('format of video not accepted'))
+}
+const imageMaxSize = 1 * 1000 * 1000
+const videoMaxSize = 300 * 1000 * 1000
+const uploadFile = multer({storage ,fileFilter, limits: {fileSize : imageMaxSize}})
+const uploadVideo = multer({storage ,videoFilter, limits: {fileSize : videoMaxSize}})
 module.exports = {
-    uploadFile
+    uploadFile ,
+    uploadVideo
 }

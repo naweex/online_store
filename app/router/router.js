@@ -6,7 +6,7 @@ const { UserAuthRoutes } = require('./user/auth')
 const router = require('express').Router()
 
 router.use('/user' , UserAuthRoutes)
-router.use('/admin' , verifyAccessToken , checkRole('ADMIN') , AdminRoutes)
+router.use('/admin' , verifyAccessToken , AdminRoutes)
 router.use('/developer' , DeveloperRoutes)
 router.use('/' , homeRoutes)
 module.exports = {

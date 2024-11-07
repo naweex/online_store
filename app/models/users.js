@@ -1,7 +1,7 @@
 const Joi = require("joi");
 const { default: mongoose } = require("mongoose");
 
-const Schema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
     first_name : {type : String} ,
     last_name : {type : String} ,
     username : {type : String , lowercase: true} ,
@@ -15,7 +15,7 @@ const Schema = new mongoose.Schema({
     bills : {type : [] , default : []} ,
     discount : {type : Number , default : 0} ,
     birthday : {type : String} ,
-    roles  : {type : [String] , default : ['USER']} ,
+    role  : {type : String , default : 'USER'} ,
     courses : {type : [mongoose.Types.ObjectId] , ref : 'course' , default : []}
 
 }, {
@@ -24,7 +24,7 @@ const Schema = new mongoose.Schema({
         virtuals : true
     }
 });
-
+UserSchema.index({first_name : 'text' , last_name : 'text' , username : 'text' , mobile: 'text' , email : 'text'})
 module.exports = {
-    UserModel : mongoose.model('user' , Schema)
+    UserModel : mongoose.model('user' , UserSchema)
 }

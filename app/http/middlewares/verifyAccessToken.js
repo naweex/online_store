@@ -26,18 +26,7 @@ try {
         next(error)
 }
 }
-function checkRole(role){
-    return function(req , res , next){
-        try {
-            const user = req.user;
-            if(user.Roles.includes(role)) return next()
-            throw createHttpError.Forbidden('you can not access this address')
-        } catch (error) {
-            next(error)
-        }
-    }
-}
+
 module.exports = {
-    verifyAccessToken ,
-    checkRole
+    verifyAccessToken 
 }

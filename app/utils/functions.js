@@ -6,6 +6,7 @@ const fs = require('fs')
 const { SECRET_KEY, REFRESH_TOKEN_SECRET_KEY } = require('./constance');
 const redisClient = require('./init_redis');
 const path = require('path');
+const { array } = require('joi');
 function randomInt(){
     return Math.floor((Math.random() * 90000) + 10000)
 }
@@ -104,6 +105,49 @@ function deleteInvalidPropertyInObject(data = {} , blackListFields = []){
         if(nullishData.includes(data[key])) delete data[key];
     })
 }
+function getTime(time) {
+    let total = Math.round(time) / 60;
+    let [min, percentage] = String(total).split(".");
+    if(percentage == undefined) percentage = "0"
+    let sec = Math.round(((percentage.substring(0,2)) * 60) / 100);
+    let hour = 0;
+    if (min > 59) {
+      total = min / 60;
+      [hour , percentage] = String(total).split(".")
+      if(percentage == undefined) percentage = "0"
+      min = Math.round(((percentage.substring(0,2)) * 60) / 100);
+    }
+    if(hour < 10 ) hour = `0${hour}` ;
+    if(min < 10) min = `0${min}`
+    if(sec < 10) sec = `0${sec}`
+    return hour + ":" + min + ":" + sec;
+  }
+  function getTimeOfCourse(chapters = []) {
+    let time,hour,minute,second = 0;
+    for (const chapter of chapters) {
+        if(Array.isArray(chapter?.episodes)){
+        for (const episode of chapter.episode) {
+            if(episode?.time) time = episode.time.split(':')
+                else time = '00:00:00'.split(':')
+            if(time.length == 3){
+                second += Number(time[0]) * 3600 //convert hour to second
+                second += Number(time[1]) * 60 // convert minute to second
+                second += Number(time[2]) //sum second with second
+            }else if(time.length == 2){
+                    second += Number(time[0]) * 60 // convert minute to second
+                    second += Number(time[1]) //sum second with second
+                }
+            }
+        }
+    }
+    hour = Math.floor(second / 3600) //convert second to hour
+    minute = Math.floor(second / 60) % 60 //convert second to minute
+    second = Math.floor(second % 60) //convert seconds to second
+    if(hour < 10 ) hour = `0${hour}` ;
+    if(min < 10) min = `0${min}`
+    if(sec < 10) sec = `0${sec}`
+    return hour + ":" + min + ":" + sec;
+  }
 
 
 module.exports = {
@@ -115,5 +159,7 @@ module.exports = {
     listOfImagesFromRequest ,
     copyObject ,
     setFeatures ,
-    deleteInvalidPropertyInObject
+    deleteInvalidPropertyInObject , 
+    getTime ,
+    getTimeOfCourse
 }

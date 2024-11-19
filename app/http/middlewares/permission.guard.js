@@ -1,4 +1,4 @@
-const { PermissionModel } = require("../../models/permissions");
+const { PermissionsModel } = require("../../models/permission");
 const { RoleModel } = require("../../models/role");
 const { PERMISSIONS } = require("../../utils/constance");
 
@@ -8,7 +8,7 @@ function checkPermission(requiredPermissions = []){
             const allPermissions = requiredPermissions.flat(2)
             const user = req.user;
             const role = await RoleModel.findOne({title : user.role})
-            const permissions = await PermissionModel.find({_id : {$in : role.permissions}})
+            const permissions = await PermissionsModel.find({_id : {$in : role.permissions}})
             const userPermissions = permissions.map(item => item.name)
             const hasPermission = allPermissions.every(permission => {
                 return userPermissions.includes(permission)

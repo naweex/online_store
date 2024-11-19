@@ -4,7 +4,6 @@ const { token } = require('morgan');
 const { UserModel } = require('../models/users');
 const fs = require('fs')
 const { SECRET_KEY, REFRESH_TOKEN_SECRET_KEY } = require('./constance');
-const redisClient = require('./init_redis');
 const path = require('path');
 const { array } = require('joi');
 function randomInt(){
